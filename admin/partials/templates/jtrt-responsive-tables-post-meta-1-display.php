@@ -2,10 +2,13 @@
 
 function checkOldTables(){
     global $post;
+    if ( ! isset( $post->ID ) ) {
+        return;
+    }
     global $wpdb;
 
     $jtrt_tables_name = $wpdb->prefix . "jtrt_tables";
-	$retrieve_data = $wpdb->get_results( "SELECT * FROM $jtrt_tables_name WHERE jttable_IDD = '".$post->ID."'" );
+	$retrieve_data = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $jtrt_tables_name WHERE jttable_IDD = %d", $post->ID ) );
     if($retrieve_data){ 
     
 	    echo '<div id="jtConverAvailMessage"><h4>Table Converter</h4><p>This plugin has detected previous data for this table. If you would like to recover/convert your previous table to be compatible with this version, you can use the option below. Note however, this feature does not work 100% so your tables will appear somewhat broken. Also you must re-add the table breakpoints/options you had before since these options are not backwards compatible.</p>
@@ -20,7 +23,7 @@ function checkOldTables(){
 }
 
 wp_nonce_field( 'jtrt_save_metabox_data', 'jtrt_save_nonce_check' );
-$value = get_post_meta( $post->ID, 'jtrt_data_settings',true );
+$value = ( isset( $post->ID ) ) ? get_post_meta( $post->ID, 'jtrt_data_settings', true ) : array();
 $text_domain = 'jtrt-responsive-tables';
 checkOldTables();
 
