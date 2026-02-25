@@ -29,13 +29,13 @@
 	 * practising this, we should strive to set a better example in our own work.
 	 */
 
-	$(document).ready(function(){
+	$(function(){
 
 		var jtrt_tables = $('.jtrt-table');
 		jtrt_tables.each(function(element) {
 			
 			var table = $(jtrt_tables[element]);
-			var id = table.attr('data-jtrt-table-id');
+			var id = table.data('jtrt-table-id');
 			var jtrt_table_data = JSON.parse($('textarea#jtrt_table_settings_'+id).html());
 			
 			if(jtrt_table_data[3] != undefined){
