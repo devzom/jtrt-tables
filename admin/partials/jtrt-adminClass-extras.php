@@ -2,7 +2,7 @@
 
 function CheckIfJTRTExists(){
     $currentPage = get_current_screen();
-    return ($currentPage->id === "jtrt_tables_post") ? true : false;
+    return (isset($currentPage->id) && $currentPage->id === "jtrt_tables_post") ? true : false;
 }
 
 function jtrt_meta_box_html_callback( $post ) {

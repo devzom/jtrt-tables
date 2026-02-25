@@ -24,23 +24,23 @@
  * @subpackage Jtrt_Responsive_Tables/includes
  * @author     John Tendik <johntendik@hotmail.com>
  */
-class Jtrt_Responsive_Tables_i18n {
+class Jtrt_Responsive_Tables_i18n
+{
+    /**
+     * Load the plugin text domain for translation.
+     *
+     * @since    1.0.0
+     */
+    public function load_plugin_textdomain()
+    {
 
+        load_plugin_textdomain(
+            'jtrt-responsive-tables',
+            false,
+            dirname(dirname(plugin_basename(__FILE__))) . '/languages/'
+        );
 
-	/**
-	 * Load the plugin text domain for translation.
-	 *
-	 * @since    1.0.0
-	 */
-	public function load_plugin_textdomain() {
-
-		load_plugin_textdomain(
-			'jtrt-responsive-tables',
-			false,
-			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
-		);
-
-	}
+    }
 
 
 
