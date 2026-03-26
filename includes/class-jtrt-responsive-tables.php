@@ -75,8 +75,25 @@ class Jtrt_Responsive_Tables {
 
 		$this->load_dependencies();
 		$this->set_locale();
-		$this->define_admin_hooks();
-		$this->define_public_hooks();
+		$this->define_shared_hooks();
+
+		if ( is_admin() ) {
+			$this->define_admin_hooks();
+		} else {
+			$this->define_public_hooks();
+		}
+	}
+
+	/**
+	 * Register all of the hooks that are shared between both the admin area and
+	 * the public-facing side of the site.
+	 *
+	 * @since    1.0.0
+	 * @access   private
+	 */
+	private function define_shared_hooks(): void {
+		$plugin_admin = new Jtrt_Responsive_Tables_Admin( $this->get_plugin_name(), $this->get_version() );
+		$this->loader->add_action( 'init', $plugin_admin, 'jtrt_create_tables_cpost' );
 	}
 
 	/**
@@ -153,8 +170,6 @@ class Jtrt_Responsive_Tables {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 
-		// Create the Custom Post Type
-		$this->loader->add_action( 'init', $plugin_admin, 'jtrt_create_tables_cpost' );
 		// Add the meta box on the custom JTRT post type
 		$this->loader->add_action( 'add_meta_boxes', $plugin_admin, 'jtrt_cpost_add_meta_box' );
 		$this->loader->add_action( 'save_post', $plugin_admin, 'jtrt_save_metabox_data' );
