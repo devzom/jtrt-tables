@@ -8,11 +8,22 @@ If you're here for the older version docs, they are now located on their own bra
 1. [Version 2.0.4](https://github.com/JohnTendik/jtrt-tables/tree/Version-2.0.4-Legacy%5D)
 
 
-# JTRT Responsive Tables Plugin V4!
+# JTRT Responsive Tables Plugin V5!
 This is a Wordpress Plugin designed to help users easily create responsive tables in the backend of their website, without having to read or write code. You can start building your table from scratch or import a CSV file to get started.
 
-This update added a few features such as:
+This major update (V5) focuses on **PHP 8 Modernization**, **Performance**, and **Security**.
 
+### V5 Highlights:
+- **Full PHP 8 Compatibility**: Refactored to support PHP 8.0+ with modern features like constructor property promotion and the nullsafe operator.
+- **Strict Typing**: Implemented `declare(strict_types=1);` across the codebase for better type safety and performance.
+- **Enhanced Performance**: 
+  - Optimized shortcode rendering logic for faster frontend load times.
+  - Efficient row/column filtering using O(1) hash lookups.
+  - Conditional hook loading to reduce overhead on non-admin pages.
+- **Improved Security**: Strengthened AJAX handling with `wp_send_json_success/error` and updated nonce verification.
+- **Cleaned Codebase**: Refactored legacy patterns to follow modern WordPress and PHP best practices.
+
+Existing features:
 0. The best table editor. 
 1. Edit cell fonts, color, size
 2. Edit cell borders, font-styles, font-decoration

@@ -71,7 +71,7 @@ class Jtrt_Responsive_Tables {
 	public function __construct() {
 
 		$this->plugin_name = 'jtrt-responsive-tables';
-		$this->version     = '4.0';
+		$this->version     = '5.0';
 
 		$this->load_dependencies();
 		$this->set_locale();

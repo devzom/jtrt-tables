@@ -3,8 +3,8 @@ Contributors: MyThirdEye
 Donate link: //
 Tags: responsive tables, responsive, table, table generator, csv to table, csv, convert csv, responsive table generator, foo tables, responsive table, mobile tables, html table generator, html5 table
 Requires at least: 4.0
-Tested up to: 5.3.2
-Stable tag: 4.1.9
+Tested up to: 6.4
+Stable tag: 5.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -107,6 +107,14 @@ If you can see your images/links in the backend but not on the frontend, then th
 6. Front End Sample 2.2
 
 == Changelog ==
+
+= 5.0.0 =
+* Major release: Modernized for PHP 8.0+
+* Implemented strict typing for improved performance and security
+* Optimized shortcode rendering and row/column filtering
+* Refactored AJAX handling with wp_send_json_success/error
+* Improved resource usage with conditional hook loading
+* Updated WordPress compatibility to 6.4
 
 = 4.1.9 =
 * Fixed adding borders functionality
