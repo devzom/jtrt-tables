@@ -184,7 +184,7 @@ class Jtrt_Responsive_Tables_Admin {
 		update_post_meta( $post_id, 'jtrt_data_settings', $my_data );
 	}
 
-	public function get_old_table_callback(): bool {
+	public function get_old_table_callback(): void {
 		require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 		global $wpdb;
 
@@ -193,21 +193,17 @@ class Jtrt_Responsive_Tables_Admin {
 		$jtrt_tables_name = $wpdb->prefix . 'jtrt_tables';
 
 		if ( $tableopt === 'delete' ) {
-			global $post_type;
 			$wpdb->delete( $jtrt_tables_name, array( 'jttable_IDD' => $getTableId ), array( '%d' ) );
-
-			echo false;
-			return false;
+			wp_send_json_success( false );
 		}
 
-		$retrieve_data = $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $jtrt_tables_name WHERE jttable_IDD = %d", $getTableId ) );
+		$retrieve_data = $wpdb->get_results( $wpdb->prepare( "SELECT object_type FROM $jtrt_tables_name WHERE jttable_IDD = %d", $getTableId ) );
 
 		if ( ! empty( $retrieve_data ) && isset( $retrieve_data[0]->object_type ) ) {
-			echo html_entity_decode( stripslashes( $retrieve_data[0]->object_type ) );
-		} else {
-			echo 'no';
+			wp_send_json_success( html_entity_decode( stripslashes( (string) $retrieve_data[0]->object_type ) ) );
 		}
-		return true;
+
+		wp_send_json_error( 'no' );
 	}
 
 
