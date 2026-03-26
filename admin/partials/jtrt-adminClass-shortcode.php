@@ -80,42 +80,69 @@ function jtrt_shortcode_table( $atts ) {
 	// We can only return once, so let's build our html!
 	$html .= "<div class='jtsettingcontainer' style='display:none;position:absolute;left:-9999px;'><textarea data-jtrt-table-id='" . $jtrt_settings['id'] . "' id='jtrt_table_settings_" . $jtrt_settings['id'] . "' cols='30' rows='10'>" . json_encode( $table_data_json ) . "</textarea><textarea data-jtrt-table-id='" . $jtrt_settings['id'] . "' id='jtrt_table_bps_" . $jtrt_settings['id'] . "' cols='30' rows='10'>" . json_encode( $myjtbpfootab ) . "</textarea></div><table id='jtrt_table_" . $jtrt_settings['id'] . "' data-sorting='" . $myjttableSorting . "' data-paging='" . $myjttablePaging . "' data-paging-size='" . $myjttablePagingCnt . "' data-paging-menu='" . $myjttablePagingMenu . "' data-filtering='" . $myjttableFiltering . "' data-jtrt-table-id='" . $jtrt_settings['id'] . "' class='jtrt-table " . $myTableCustomClass . " ' >";
 
-	$filteredRows = $jtrt_settings['filterrows'] !== '' ? explode( ',', (string) $jtrt_settings['filterrows'] ) : array();
-	$filteredCols = $jtrt_settings['filtercols'] !== '' ? explode( ',', (string) $jtrt_settings['filtercols'] ) : array();
+	$filteredRows = $jtrt_settings['filterrows'] !== '' ? array_flip( explode( ',', (string) $jtrt_settings['filterrows'] ) ) : array();
+	$filteredCols = $jtrt_settings['filtercols'] !== '' ? array_flip( explode( ',', (string) $jtrt_settings['filtercols'] ) ) : array();
+
+	/**
+	 * Helper function to process cell content efficiently.
+	 *
+	 * @param mixed $cell The cell content.
+	 * @return string Processed content.
+	 */
+	$process_cell = static function ( $cell ) {
+		$cell_str = (string) $cell;
+		if ( $cell_str === '' ) {
+			return '';
+		}
+
+		// Only replace newlines if they exist.
+		if ( str_contains( $cell_str, "\n" ) || str_contains( $cell_str, "\r" ) ) {
+			$cell_str = str_replace( array( "\r\n", "\r", "\n" ), '<br>', $cell_str );
+		}
+
+		// Only run do_shortcode if shortcodes are likely present.
+		if ( str_contains( $cell_str, '[' ) ) {
+			return do_shortcode( $cell_str );
+		}
+
+		return $cell_str;
+	};
 
 	// For each loop to loop through the table data, the first loop is the rows.
 	foreach ( $table_data as $indx => $row ) {
+		$row_num_str = (string) ( $indx + 1 );
+		if ( isset( $filteredRows[ $row_num_str ] ) ) {
+			continue;
+		}
 
-		if ( ! in_array( (string) ( $indx + 1 ), $filteredRows, true ) ) {
-			if ( $indx === 0 ) {
-				$html .= '<thead><tr>';
-				foreach ( $row as $cellindx => $cell ) {
-					// For each col item, insert the table data tag and put the data inside it.
-					if ( ! in_array( (string) ( $cellindx + 1 ), $filteredCols, true ) ) {
-						$html .= '<th>' . do_shortcode( preg_replace( "/[\n\r]/", '<br>', (string) $cell ) ) . '</th>';
-					}
+		if ( $indx === 0 ) {
+			$html .= '<thead><tr>';
+			foreach ( $row as $cellindx => $cell ) {
+				$col_num_str = (string) ( $cellindx + 1 );
+				// For each col item, insert the table data tag and put the data inside it.
+				if ( ! isset( $filteredCols[ $col_num_str ] ) ) {
+					$html .= '<th>' . $process_cell( $cell ) . '</th>';
 				}
-				$html .= '</tr></thead><tbody>';
-			} else {
-				// For each row, add the table row tag
-
-				$html .= '<tr>';
-				// Start another loop just for good measure. just kidding, we need this loop for the columns within the rows.
-				foreach ( $row as $cellindx => $cell ) {
-					// For each col item, insert the table data tag and put the data inside it.
-					if ( ! in_array( (string) ( $cellindx + 1 ), $filteredCols, true ) ) {
-						if ( $myTableResponsiveStyle === 'stack' ) {
-							$html .= "<td><span class='stackedheadtitlejt' style='font-weight:bold;'>" . $table_data[0][ $cellindx ] . ':</span><br>' . do_shortcode( preg_replace( "/[\n\r]/", '<br>', (string) $cell ) ) . '</td>';
-						} else {
-							$html .= '<td>' . do_shortcode( preg_replace( "/[\n\r]/", '<br>', (string) $cell ) ) . '</td>';
-						}
-					}
-				}
-
-				// close our tr so the HTML inspectors happy. Just kidding this is important.
-				$html .= '</tr>';
-
 			}
+			$html .= '</tr></thead><tbody>';
+		} else {
+			// For each row, add the table row tag
+			$html .= '<tr>';
+			// Start another loop just for good measure. just kidding, we need this loop for the columns within the rows.
+			foreach ( $row as $cellindx => $cell ) {
+				$col_num_str = (string) ( $cellindx + 1 );
+				// For each col item, insert the table data tag and put the data inside it.
+				if ( ! isset( $filteredCols[ $col_num_str ] ) ) {
+					if ( $myTableResponsiveStyle === 'stack' ) {
+						$header_title = $process_cell( $table_data[0][ $cellindx ] ?? '' );
+						$html        .= "<td><span class='stackedheadtitlejt' style='font-weight:bold;'>" . $header_title . ':</span><br>' . $process_cell( $cell ) . '</td>';
+					} else {
+						$html .= '<td>' . $process_cell( $cell ) . '</td>';
+					}
+				}
+			}
+			// close our tr so the HTML inspectors happy. Just kidding this is important.
+			$html .= '</tr>';
 		}
 	}
 
