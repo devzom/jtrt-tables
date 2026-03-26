@@ -182,6 +182,9 @@ class Jtrt_Responsive_Tables_Admin {
 		}
 		// Update the meta field in the database.
 		update_post_meta( $post_id, 'jtrt_data_settings', $my_data );
+
+		// Invalidate shortcode cache.
+		update_post_meta( $post_id, '_jtrt_cache_version', time() );
 	}
 
 	public function get_old_table_callback(): void {
