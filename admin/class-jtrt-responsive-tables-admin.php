@@ -171,10 +171,85 @@ class Jtrt_Responsive_Tables_Admin {
 		$my_data = $_POST['jtrt-table-data'];
 
 		if ( is_array( $my_data ) ) {
+			$allowed_html = array(
+				'a'      => array(
+					'href'   => array(),
+					'title'  => array(),
+					'target' => array(),
+				),
+				'br'     => array(),
+				'em'     => array(),
+				'strong' => array(),
+				'b'      => array(),
+				'i'      => array(),
+				'u'      => array(),
+				'big'    => array(),
+				'span'   => array(
+					'style' => array(),
+					'class' => array(),
+				),
+				'img'    => array(
+					'src'    => array(),
+					'alt'    => array(),
+					'width'  => array(),
+					'height' => array(),
+					'class'  => array(),
+				),
+				'ul'     => array(),
+				'li'     => array(),
+				'ol'     => array(),
+				'hr'     => array(),
+				'p'      => array(
+					'style' => array(),
+					'class' => array(),
+				),
+				'div'    => array(
+					'style' => array(),
+					'class' => array(),
+				),
+				'table'  => array(
+					'class' => array(),
+					'style' => array(),
+				),
+				'thead'  => array(),
+				'tbody'  => array(),
+				'tr'     => array(),
+				'td'     => array(
+					'colspan' => array(),
+					'rowspan' => array(),
+					'style'   => array(),
+					'class'   => array(),
+				),
+				'th'     => array(
+					'colspan' => array(),
+					'rowspan' => array(),
+					'style'   => array(),
+					'class'   => array(),
+				),
+			);
+
 			array_walk(
 				$my_data,
-				function ( &$elem, $inx ) {
-					if ( $inx !== 'tabledata' ) {
+				function ( &$elem, $inx ) use ( $allowed_html ) {
+					if ( $inx === 'tabledata' ) {
+						// The tabledata is a JSON string containing arrays.
+						// We need to decode it, sanitize each cell, then re-encode it.
+						$decoded = json_decode( (string) $elem, true );
+						if ( is_array( $decoded ) ) {
+							// Index 0 is typically the raw cell data array of arrays
+							if ( isset( $decoded[0] ) && is_array( $decoded[0] ) ) {
+								array_walk_recursive(
+									$decoded[0],
+									function ( &$cell ) use ( $allowed_html ) {
+										if ( is_string( $cell ) ) {
+											$cell = wp_kses( $cell, $allowed_html );
+										}
+									}
+								);
+							}
+							$elem = json_encode( $decoded );
+						}
+					} else {
 						$elem = sanitize_textarea_field( $elem );
 					}
 				}
