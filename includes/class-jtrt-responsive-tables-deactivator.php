@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Fired during plugin deactivation
  *
@@ -20,18 +22,15 @@
  * @subpackage Jtrt_Responsive_Tables/includes
  * @author     Jakub Zomerfeld <devzom@devzom.com>
  */
-class Jtrt_Responsive_Tables_Deactivator
-{
-    /**
-     * Short Description. (use period)
-     *
-     * Long Description.
-     *
-     * @since    1.0.0
-     */
-    public static function deactivate()
-    {
+class Jtrt_Responsive_Tables_Deactivator {
 
-    }
-
+	/**
+	 * Short Description. (use period)
+	 *
+	 * Long Description.
+	 *
+	 * @since    1.0.0
+	 */
+	public static function deactivate(): void {
+	}
 }

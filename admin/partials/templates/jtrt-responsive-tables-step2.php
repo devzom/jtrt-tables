@@ -1,12 +1,11 @@
-<?php 
+<?php
 
-$value = get_post_meta( $post->ID, 'jtrt_data_settings',true ); 
+declare(strict_types=1);
+
+$value       = get_post_meta( $post->ID, 'jtrt_data_settings', true );
 $text_domain = 'jtrt-responsive-tables';
 
-$sortDisabledVal = "";
-if(isset($value['jtTableResponsiveStyle']) && $value['jtTableResponsiveStyle'] == "stack"){
-    $sortDisabledVal = "disabled";
-};
+$sortDisabledVal = ( ( $value['jtTableResponsiveStyle'] ?? '' ) === 'stack' ) ? 'disabled' : '';
 
 ?>
 

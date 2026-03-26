@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * The file that defines the core plugin class
  *
@@ -37,7 +39,7 @@ class Jtrt_Responsive_Tables {
 	 * @access   protected
 	 * @var      Jtrt_Responsive_Tables_Loader    $loader    Maintains and registers all hooks for the plugin.
 	 */
-	protected $loader;
+	protected Jtrt_Responsive_Tables_Loader $loader;
 
 	/**
 	 * The unique identifier of this plugin.
@@ -46,7 +48,7 @@ class Jtrt_Responsive_Tables {
 	 * @access   protected
 	 * @var      string    $plugin_name    The string used to uniquely identify this plugin.
 	 */
-	protected $plugin_name;
+	protected string $plugin_name;
 
 	/**
 	 * The current version of the plugin.
@@ -55,7 +57,7 @@ class Jtrt_Responsive_Tables {
 	 * @access   protected
 	 * @var      string    $version    The current version of the plugin.
 	 */
-	protected $version;
+	protected string $version;
 
 	/**
 	 * Define the core functionality of the plugin.
@@ -69,13 +71,12 @@ class Jtrt_Responsive_Tables {
 	public function __construct() {
 
 		$this->plugin_name = 'jtrt-responsive-tables';
-		$this->version = '4.0';
+		$this->version     = '4.0';
 
 		$this->load_dependencies();
 		$this->set_locale();
 		$this->define_admin_hooks();
 		$this->define_public_hooks();
-
 	}
 
 	/**
@@ -94,33 +95,32 @@ class Jtrt_Responsive_Tables {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function load_dependencies() {
+	private function load_dependencies(): void {
 
 		/**
 		 * The class responsible for orchestrating the actions and filters of the
 		 * core plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-jtrt-responsive-tables-loader.php';
+		require_once plugin_dir_path( __DIR__ ) . 'includes/class-jtrt-responsive-tables-loader.php';
 
 		/**
 		 * The class responsible for defining internationalization functionality
 		 * of the plugin.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-jtrt-responsive-tables-i18n.php';
+		require_once plugin_dir_path( __DIR__ ) . 'includes/class-jtrt-responsive-tables-i18n.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the admin area.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'admin/class-jtrt-responsive-tables-admin.php';
+		require_once plugin_dir_path( __DIR__ ) . 'admin/class-jtrt-responsive-tables-admin.php';
 
 		/**
 		 * The class responsible for defining all actions that occur in the public-facing
 		 * side of the site.
 		 */
-		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-jtrt-responsive-tables-public.php';
+		require_once plugin_dir_path( __DIR__ ) . 'public/class-jtrt-responsive-tables-public.php';
 
 		$this->loader = new Jtrt_Responsive_Tables_Loader();
-
 	}
 
 	/**
@@ -132,12 +132,11 @@ class Jtrt_Responsive_Tables {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function set_locale() {
+	private function set_locale(): void {
 
 		$plugin_i18n = new Jtrt_Responsive_Tables_i18n();
 
 		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
-
 	}
 
 	/**
@@ -147,13 +146,13 @@ class Jtrt_Responsive_Tables {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function define_admin_hooks() {
+	private function define_admin_hooks(): void {
 
 		$plugin_admin = new Jtrt_Responsive_Tables_Admin( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
-		
+
 		// Create the Custom Post Type
 		$this->loader->add_action( 'init', $plugin_admin, 'jtrt_create_tables_cpost' );
 		// Add the meta box on the custom JTRT post type
@@ -161,9 +160,8 @@ class Jtrt_Responsive_Tables {
 		$this->loader->add_action( 'save_post', $plugin_admin, 'jtrt_save_metabox_data' );
 		$this->loader->add_action( 'wp_ajax_get_old_table', $plugin_admin, 'get_old_table_callback' );
 		$this->loader->add_action( 'admin_action_jtrt_duplicate_post_as_draft', $plugin_admin, 'jtrt_duplicate_post_as_draft' );
- 		$this->loader->add_filter( 'post_row_actions', $plugin_admin,'jtrt_duplicate_post_link', 10, 2 );
-		$this->loader->add_action( 'post_edit_form_tag',$plugin_admin,'jtrt_edit_save_form_encytpe');
-
+		$this->loader->add_filter( 'post_row_actions', $plugin_admin, 'jtrt_duplicate_post_link', 10, 2 );
+		$this->loader->add_action( 'post_edit_form_tag', $plugin_admin, 'jtrt_edit_save_form_encytpe' );
 	}
 
 	/**
@@ -173,13 +171,12 @@ class Jtrt_Responsive_Tables {
 	 * @since    1.0.0
 	 * @access   private
 	 */
-	private function define_public_hooks() {
+	private function define_public_hooks(): void {
 
 		$plugin_public = new Jtrt_Responsive_Tables_Public( $this->get_plugin_name(), $this->get_version() );
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
-
 	}
 
 	/**
@@ -187,7 +184,7 @@ class Jtrt_Responsive_Tables {
 	 *
 	 * @since    1.0.0
 	 */
-	public function run() {
+	public function run(): void {
 		$this->loader->run();
 	}
 
@@ -198,7 +195,7 @@ class Jtrt_Responsive_Tables {
 	 * @since     1.0.0
 	 * @return    string    The name of the plugin.
 	 */
-	public function get_plugin_name() {
+	public function get_plugin_name(): string {
 		return $this->plugin_name;
 	}
 
@@ -208,7 +205,7 @@ class Jtrt_Responsive_Tables {
 	 * @since     1.0.0
 	 * @return    Jtrt_Responsive_Tables_Loader    Orchestrates the hooks of the plugin.
 	 */
-	public function get_loader() {
+	public function get_loader(): Jtrt_Responsive_Tables_Loader {
 		return $this->loader;
 	}
 
@@ -218,8 +215,7 @@ class Jtrt_Responsive_Tables {
 	 * @since     1.0.0
 	 * @return    string    The version number of the plugin.
 	 */
-	public function get_version() {
+	public function get_version(): string {
 		return $this->version;
 	}
-
 }

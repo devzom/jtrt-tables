@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * The plugin bootstrap file
  *
@@ -26,38 +28,36 @@
  */
 
 // If this file is called directly, abort.
-if (! defined('WPINC')) {
-    die;
+if ( ! defined( 'WPINC' ) ) {
+	die;
 }
 
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-jtrt-responsive-tables-activator.php
  */
-function activate_jtrt_responsive_tables()
-{
-    require_once plugin_dir_path(__FILE__) . 'includes/class-jtrt-responsive-tables-activator.php';
-    Jtrt_Responsive_Tables_Activator::activate();
+function activate_jtrt_responsive_tables(): void {
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-jtrt-responsive-tables-activator.php';
+	Jtrt_Responsive_Tables_Activator::activate();
 }
 
 /**
  * The code that runs during plugin deactivation.
  * This action is documented in includes/class-jtrt-responsive-tables-deactivator.php
  */
-function deactivate_jtrt_responsive_tables()
-{
-    require_once plugin_dir_path(__FILE__) . 'includes/class-jtrt-responsive-tables-deactivator.php';
-    Jtrt_Responsive_Tables_Deactivator::deactivate();
+function deactivate_jtrt_responsive_tables(): void {
+	require_once plugin_dir_path( __FILE__ ) . 'includes/class-jtrt-responsive-tables-deactivator.php';
+	Jtrt_Responsive_Tables_Deactivator::deactivate();
 }
 
-register_activation_hook(__FILE__, 'activate_jtrt_responsive_tables');
-register_deactivation_hook(__FILE__, 'deactivate_jtrt_responsive_tables');
+register_activation_hook( __FILE__, 'activate_jtrt_responsive_tables' );
+register_deactivation_hook( __FILE__, 'deactivate_jtrt_responsive_tables' );
 
 /**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-require plugin_dir_path(__FILE__) . 'includes/class-jtrt-responsive-tables.php';
+require plugin_dir_path( __FILE__ ) . 'includes/class-jtrt-responsive-tables.php';
 
 /**
  * Begins execution of the plugin.
@@ -68,11 +68,10 @@ require plugin_dir_path(__FILE__) . 'includes/class-jtrt-responsive-tables.php';
  *
  * @since    1.0.0
  */
-function run_jtrt_responsive_tables()
-{
+function run_jtrt_responsive_tables(): void {
 
-    $plugin = new Jtrt_Responsive_Tables();
-    $plugin->run();
+	$plugin = new Jtrt_Responsive_Tables();
+	$plugin->run();
 
 }
 run_jtrt_responsive_tables();
