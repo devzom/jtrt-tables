@@ -17,10 +17,13 @@ This major update (V5) focuses on **PHP 8 Modernization**, **Performance**, and 
 - **Full PHP 8 Compatibility**: Refactored to support PHP 8.0+ with modern features like constructor property promotion and the nullsafe operator.
 - **Strict Typing**: Implemented `declare(strict_types=1);` across the codebase for better type safety and performance.
 - **Enhanced Performance**: 
-  - Optimized shortcode rendering logic for faster frontend load times.
-  - Efficient row/column filtering using O(1) hash lookups.
-  - Conditional hook loading to reduce overhead on non-admin pages.
-- **Improved Security**: Strengthened AJAX handling with `wp_send_json_success/error` and updated nonce verification.
+  - **HTML Caching**: Introduced transient-based caching for shortcode output with automatic cache invalidation on table updates.
+  - **Conditional Asset Loading**: Refactored frontend assets (FooTable, DataTables) to only load when specifically required by a table's configuration.
+  - **O(1) Filtering**: Optimized row/column filtering using hash-based lookups for faster rendering of large tables.
+  - **Lazy Loading Hooks**: Admin-specific hooks are now only loaded in the admin area, reducing frontend overhead.
+- **Improved Security**: 
+  - **Server-Side Sanitization**: Implemented robust `wp_kses` sanitization for all table cells, allowing only safe HTML tags and attributes.
+  - **Hardened AJAX**: Refactored AJAX callbacks with `wp_send_json_success/error` and improved nonce verification.
 - **Cleaned Codebase**: Refactored legacy patterns to follow modern WordPress and PHP best practices.
 
 Existing features:

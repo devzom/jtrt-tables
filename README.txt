@@ -108,12 +108,20 @@ If you can see your images/links in the backend but not on the frontend, then th
 
 == Changelog ==
 
+= 5.2.0 =
+
+* Refactored frontend assets (FooTable, DataTables) to load conditionally
+
+= 5.1.0 =
+
+* Introduced transient-based HTML caching for faster shortcode rendering
+
 = 5.0.0 =
 * Major release: Modernized for PHP 8.0+
 * Implemented strict typing for improved performance and security
-* Optimized shortcode rendering and row/column filtering
-* Refactored AJAX handling with wp_send_json_success/error
-* Improved resource usage with conditional hook loading
+* Optimized row/column filtering using hash-based lookups
+* Hardened AJAX callbacks with wp_send_json_success/error
+* Improved resource usage with lazy-loading hooks
 * Updated WordPress compatibility to 6.4
 
 = 4.1.9 =
