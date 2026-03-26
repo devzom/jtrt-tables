@@ -74,7 +74,10 @@ class Jtrt_Responsive_Tables_Public {
 		 * class.
 		 */
 
-		// wp_enqueue_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/jtrt-responsive-tables-public.css', array(), $this->version, 'all' );
+		wp_register_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/jtrt-responsive-tables-public.css', array(), $this->version, 'all' );
+		wp_register_style( $this->plugin_name . '-font-awesome', plugin_dir_url( __FILE__ ) . 'css/font-awesome.min.css', array(), '4.7.0', 'all' );
+		wp_register_style( $this->plugin_name . '-footable', plugin_dir_url( __FILE__ ) . 'css/footable.standalone.min.css', array(), '2.0.3', 'all' );
+		wp_register_style( $this->plugin_name . '-datatables', 'https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css', array(), '1.10.12', 'all' );
 	}
 
 	/**
@@ -96,6 +99,8 @@ class Jtrt_Responsive_Tables_Public {
 		 * class.
 		 */
 
-		// wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/jtrt-responsive-tables-public.js', array( 'jquery' ), $this->version, false );
+		wp_register_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/jtrt-responsive-tables-public.js', array( 'jquery' ), $this->version, true );
+		wp_register_script( $this->plugin_name . '-footable', plugin_dir_url( __FILE__ ) . 'js/vendor/footable.min.js', array( 'jquery' ), '2.0.3', true );
+		wp_register_script( $this->plugin_name . '-datatables', 'https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js', array( 'jquery' ), '1.10.12', true );
 	}
 }

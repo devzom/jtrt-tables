@@ -171,19 +171,19 @@ function jtrt_shortcode_table( $atts ) {
 	}
 
 	// Always enqueue necessary assets.
+	$plugin_name            = 'jtrt-responsive-tables';
 	$myTableResponsiveStyle = (string) ( $table_post_meta['jtTableResponsiveStyle'] ?? '' );
 	$myjttableFiltering     = isset( $table_post_meta['jtTableEnableFilters'] ) ? 'true' : 'false';
 	$myjttableSorting       = isset( $table_post_meta['jtTableEnableSorting'] ) ? 'true' : 'false';
 	$myjttablePaging        = isset( $table_post_meta['jtTableEnablePaging'] ) ? 'true' : 'false';
 
 	if ( $myTableResponsiveStyle === 'footable' ) {
-		wp_enqueue_script( 'jtbackendfrontendfoo-js', plugin_dir_url( __FILE__ ) . '../../public/js/vendor/footable.min.js', array( 'jquery' ), '4.0', false );
-		wp_enqueue_style( 'jtbackendfrontendss-jskka12', plugin_dir_url( __FILE__ ) . '../../public/css/font-awesome.min.css', array(), '4.0', 'all' );
-		wp_enqueue_style( 'jtbackendfrontendss-jskk', plugin_dir_url( __FILE__ ) . '../../public/css/footable.standalone.min.css', array(), '4.0', 'all' );
+		wp_enqueue_script( $plugin_name . '-footable' );
+		wp_enqueue_style( $plugin_name . '-font-awesome' );
+		wp_enqueue_style( $plugin_name . '-footable' );
 	} elseif ( $myTableResponsiveStyle === 'scroll' || $myTableResponsiveStyle === 'stack' ) {
 		if ( $myjttableFiltering === 'true' || $myjttablePaging === 'true' || $myjttableSorting === 'true' ) {
-			wp_enqueue_style( 'jtbackendfrontendss-jskka', 'https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css', array(), '4.0', 'all' );
-			wp_register_script( 'jtbackendfrontend-js-dtb', 'https://cdn.datatables.net/1.10.12/js/jquery.dataTables.min.js', array( 'jquery' ), '4.0', false );
+			wp_enqueue_style( $plugin_name . '-datatables' );
 
 			$translation_array = array(
 				'next_string'   => __( 'Next', 'jtrt-responsive-tables' ),
@@ -198,12 +198,12 @@ function jtrt_shortcode_table( $atts ) {
 				'last'          => __( 'Last', 'jtrt-responsive-tables' ),
 				'first'         => __( 'First', 'jtrt-responsive-tables' ),
 			);
-			wp_localize_script( 'jtbackendfrontend-js-dtb', 'translation_for_frontend', $translation_array );
-			wp_enqueue_script( 'jtbackendfrontend-js-dtb' );
+			wp_localize_script( $plugin_name . '-datatables', 'translation_for_frontend', $translation_array );
+			wp_enqueue_script( $plugin_name . '-datatables' );
 		}
 	}
-	wp_enqueue_style( 'jtbackendfrontend-css', plugin_dir_url( __FILE__ ) . '../../public/css/jtrt-responsive-tables-public.css', array(), '4.0', 'all' );
-	wp_enqueue_script( 'jtbackendfrontend-js', plugin_dir_url( __FILE__ ) . '../../public/js/jtrt-responsive-tables-public.js', array( 'jquery' ), '4.0', false );
+	wp_enqueue_style( $plugin_name );
+	wp_enqueue_script( $plugin_name );
 
 	$custom_css = '';
 	if ( isset( $table_post_meta['jtTableEnableColHighlight'] ) ) {
@@ -212,7 +212,7 @@ function jtrt_shortcode_table( $atts ) {
 	if ( isset( $table_post_meta['jtTableEnableRowHighlight'] ) ) {
 		$custom_css .= '.highlightRows #jtrt_table_' . $table_id . ' tbody tr:hover td { background:' . ( $table_post_meta['jtTableEnableRowHighlightcol'] ?? '' ) . ' !important; }';
 	}
-	wp_add_inline_style( 'jtbackendfrontend-css', $custom_css );
+	wp_add_inline_style( $plugin_name, $custom_css );
 
 	return $html;
 }
