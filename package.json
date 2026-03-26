@@ -1,0 +1,29 @@
+{
+  "name": "jtrt-tables",
+  "version": "1.0.0",
+  "description": "If you're here for the older version docs, they are now located on their own branch.",
+  "homepage": "https://github.com/JohnTendik/jtrt-tables#readme",
+  "bugs": {
+    "url": "https://github.com/JohnTendik/jtrt-tables/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JohnTendik/jtrt-tables.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "lint": "eslint . --ext .php",
+    "fix": "eslint --fix . --ext .php",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@wordpress/eslint-plugin": "^24.4.0",
+    "eslint-plugin-react": "^7.37.5"
+  }
+}

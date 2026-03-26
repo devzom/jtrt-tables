@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * The plugin bootstrap file
  *
@@ -8,17 +10,17 @@
  * registers the activation and deactivation functions, and defines a function
  * that starts the plugin.
  *
- * @link              http://johntendik.github.io
- * @since             1.0.0
+ * @link              https://github.com/devzom
+ * @since             5.0.0
  * @package           Jtrt_Responsive_Tables
  *
  * @wordpress-plugin
  * Plugin Name:       JTRT Responsive Tables
  * Plugin URI:        https://wordpress.org/plugins/jtrt-responsive-tables/
  * Description:       The most advanced table editor for wordpress.
- * Version:           4.1.9
- * Author:            John Tendik
- * Author URI:        https://github.com/mythirdeye/jtrt-tables
+ * Version:           5.0.0
+ * Author:            Jakub Zomerfeld after John Tendik
+ * Author URI:        https://github.com/devzom
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       jtrt-responsive-tables
@@ -34,7 +36,7 @@ if ( ! defined( 'WPINC' ) ) {
  * The code that runs during plugin activation.
  * This action is documented in includes/class-jtrt-responsive-tables-activator.php
  */
-function activate_jtrt_responsive_tables() {
+function activate_jtrt_responsive_tables(): void {
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-jtrt-responsive-tables-activator.php';
 	Jtrt_Responsive_Tables_Activator::activate();
 }
@@ -43,7 +45,7 @@ function activate_jtrt_responsive_tables() {
  * The code that runs during plugin deactivation.
  * This action is documented in includes/class-jtrt-responsive-tables-deactivator.php
  */
-function deactivate_jtrt_responsive_tables() {
+function deactivate_jtrt_responsive_tables(): void {
 	require_once plugin_dir_path( __FILE__ ) . 'includes/class-jtrt-responsive-tables-deactivator.php';
 	Jtrt_Responsive_Tables_Deactivator::deactivate();
 }
@@ -66,7 +68,7 @@ require plugin_dir_path( __FILE__ ) . 'includes/class-jtrt-responsive-tables.php
  *
  * @since    1.0.0
  */
-function run_jtrt_responsive_tables() {
+function run_jtrt_responsive_tables(): void {
 
 	$plugin = new Jtrt_Responsive_Tables();
 	$plugin->run();

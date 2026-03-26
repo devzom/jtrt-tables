@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Define the internationalization functionality
  *
@@ -26,13 +28,12 @@
  */
 class Jtrt_Responsive_Tables_i18n {
 
-
 	/**
 	 * Load the plugin text domain for translation.
 	 *
 	 * @since    1.0.0
 	 */
-	public function load_plugin_textdomain() {
+	public function load_plugin_textdomain(): void {
 
 		load_plugin_textdomain(
 			'jtrt-responsive-tables',
@@ -41,7 +42,5 @@ class Jtrt_Responsive_Tables_i18n {
 		);
 
 	}
-
-
 
 }

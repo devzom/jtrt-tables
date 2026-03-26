@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Fired during plugin deactivation
  *
- * @link       http://johntendik.github.io
- * @since      1.0.0
+ * @link       https://github.com/devzom
+ * @since      5.0.0
  *
  * @package    Jtrt_Responsive_Tables
  * @subpackage Jtrt_Responsive_Tables/includes
@@ -15,10 +17,10 @@
  *
  * This class defines all code necessary to run during the plugin's deactivation.
  *
- * @since      1.0.0
+ * @since      5.0.0
  * @package    Jtrt_Responsive_Tables
  * @subpackage Jtrt_Responsive_Tables/includes
- * @author     John Tendik <johntendik@hotmail.com>
+ * @author     Jakub Zomerfeld <devzom@devzom.com>
  */
 class Jtrt_Responsive_Tables_Deactivator {
 
@@ -29,8 +31,6 @@ class Jtrt_Responsive_Tables_Deactivator {
 	 *
 	 * @since    1.0.0
 	 */
-	public static function deactivate() {
-
+	public static function deactivate(): void {
 	}
-
 }
