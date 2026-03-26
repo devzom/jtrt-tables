@@ -18,6 +18,8 @@
     "doc": "docs"
   },
   "scripts": {
+    "lint": "eslint . --ext .php",
+    "fix": "eslint --fix . --ext .php",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {

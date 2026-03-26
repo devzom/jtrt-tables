@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Define the internationalization functionality
  *
@@ -24,24 +26,21 @@
  * @subpackage Jtrt_Responsive_Tables/includes
  * @author     John Tendik <johntendik@hotmail.com>
  */
-class Jtrt_Responsive_Tables_i18n
-{
-    /**
-     * Load the plugin text domain for translation.
-     *
-     * @since    1.0.0
-     */
-    public function load_plugin_textdomain()
-    {
+class Jtrt_Responsive_Tables_i18n {
 
-        load_plugin_textdomain(
-            'jtrt-responsive-tables',
-            false,
-            dirname(dirname(plugin_basename(__FILE__))) . '/languages/'
-        );
+	/**
+	 * Load the plugin text domain for translation.
+	 *
+	 * @since    1.0.0
+	 */
+	public function load_plugin_textdomain(): void {
 
-    }
+		load_plugin_textdomain(
+			'jtrt-responsive-tables',
+			false,
+			dirname( dirname( plugin_basename( __FILE__ ) ) ) . '/languages/'
+		);
 
-
+	}
 
 }
