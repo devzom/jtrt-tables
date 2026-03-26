@@ -1,14 +1,6 @@
-# SUPPORT IS NO LONGER AVAILABLE FOR THIS PROJECT
-# If you want to take this over, please contact me =)
+# This is a fork of official repository of JTRT Responsive Tables Plugin
 
-# Docs
-If you're here for the older version docs, they are now located on their own branch.
-
-0. [Version 1.3.2](https://github.com/JohnTendik/jtrt-tables/tree/Version-1.3.2-Legacy-%5D)
-1. [Version 2.0.4](https://github.com/JohnTendik/jtrt-tables/tree/Version-2.0.4-Legacy%5D)
-
-
-# JTRT Responsive Tables Plugin V5!
+## JTRT Responsive Tables Plugin V5!
 This is a Wordpress Plugin designed to help users easily create responsive tables in the backend of their website, without having to read or write code. You can start building your table from scratch or import a CSV file to get started.
 
 This major update (V5) focuses on **PHP 8 Modernization**, **Performance**, and **Security**.
@@ -48,6 +40,13 @@ Existing features:
 18. Context menu for easy table editting (right click)
 19. Read only cells 
 20. Pagination, sorting and filtering in the front-end
+
+# Docs
+If you're here for the older version docs, they are now located on their own branch.
+
+0. [Version 1.3.2](https://github.com/JohnTendik/jtrt-tables/tree/Version-1.3.2-Legacy-%5D)
+1. [Version 2.0.4](https://github.com/JohnTendik/jtrt-tables/tree/Version-2.0.4-Legacy%5D)
+
 
 ### Update Notice 
 Unfortunately, because this update is completely different than the previous 3 versions and uses updated scripts/plugins, this update is not backward compatible* with the previous version. If you already have tables you created with the earlier versions of this plugin, you will need to recreate them with this version*. I have included a "converter" for this update, so if you're upgrading from v3 to v4 you may be able to use the option provided in the plugin. If you have previous tables the plugin will detect this and ask you if you want to convert your data to be compatible with v4. This doesn't work 100% of the times, so your table may appear broken. Fixing it should be pretty easy I'm hoping. If you click the "don't show me this message again" you will never see the message again but your table will be deleted from the old database(its worthless it didn't even work properly) so be warned. 
