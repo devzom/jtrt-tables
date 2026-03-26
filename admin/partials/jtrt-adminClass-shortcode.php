@@ -20,145 +20,161 @@ function jtrt_shortcode_table( $atts ) {
 		$atts
 	);
 
-	$table_post_meta = get_post_meta( (int) $jtrt_settings['id'], 'jtrt_data_settings', true ); // get the table meta options
+	$table_id = (int) $jtrt_settings['id'];
+	if ( $table_id <= 0 ) {
+		return '';
+	}
+
+	$table_post_meta = get_post_meta( $table_id, 'jtrt_data_settings', true ); // get the table meta options
 
 	if ( ! is_array( $table_post_meta ) || ! isset( $table_post_meta['tabledata'] ) ) {
-		echo 'Unfortunately we could not locate the table you\'re looking for.';
-		return;
+		return 'Unfortunately we could not locate the table you\'re looking for.';
 	}
 
-	$table_data_json = json_decode( (string) $table_post_meta['tabledata'], true );
-	$table_data      = $table_data_json[0] ?? null;
-	$table_cell_data = $table_data_json[1] ?? array();
+	// Generate a unique cache key based on ID, filters, and cache version.
+	$cache_version = get_post_meta( $table_id, '_jtrt_cache_version', true );
+	$cache_key     = 'jtrt_cache_' . $table_id . '_' . $cache_version . '_' . md5( (string) $jtrt_settings['filterrows'] . (string) $jtrt_settings['filtercols'] );
+	$html          = get_transient( $cache_key );
 
-	if ( ! $table_data ) {
-		echo 'Unfortunately we could not locate the table you\'re looking for.';
-		return;
-	}
+	if ( $html === false ) {
+		$table_data_json = json_decode( (string) $table_post_meta['tabledata'], true );
+		$table_data      = $table_data_json[0] ?? null;
+		$table_cell_data = $table_data_json[1] ?? array();
 
-	$showTableTitle    = isset( $table_post_meta['jtShowTableTitle'] ) ? 'true' : 'false';
-	$showTableTitlePos = explode( ',', (string) ( $table_post_meta['jtShowTableTitlePos'] ?? '' ) );
-	$myTableTitle      = get_the_title( (int) $jtrt_settings['id'] );
-
-	$myTableResponsiveStyle = (string) ( $table_post_meta['jtTableResponsiveStyle'] ?? '' );
-	$myTableStackPrefWidth  = (string) ( $table_post_meta['jtStackPrefWidth'] ?? '' );
-
-	$myTableCustomClass = esc_textarea( (string) ( $table_post_meta['jtTableCustomClass'] ?? '' ) );
-
-	$myTableHoverRows    = isset( $table_post_meta['jtTableEnableRowHighlight'] ) ? 'highlightRows' : '';
-	$myTableHoverRowsCol = isset( $table_post_meta['jtTableEnableRowHighlight'] ) ? "data-jtrt-rowhighligh-color='" . ( $table_post_meta['jtTableEnableRowHighlightcol'] ?? '' ) . "'" : '';
-	$myTableHoverCols    = isset( $table_post_meta['jtTableEnableColHighlight'] ) ? 'highlightCols' : '';
-	$myTableHoverColsCol = isset( $table_post_meta['jtTableEnableColHighlight'] ) ? "data-jtrt-colhighligh-color='" . ( $table_post_meta['jtTableEnableColHighlightcol'] ?? '' ) . "'" : '';
-
-	$myjtbpfootab = array();
-
-	if ( $myTableResponsiveStyle === 'footable' ) {
-		$myjtbpfootab['xlarge'] = (string) ( $table_post_meta['jtFootableBPxlarge'] ?? '' );
-		$myjtbpfootab['large']  = (string) ( $table_post_meta['jtFootableBPlarge'] ?? '' );
-		$myjtbpfootab['medium'] = (string) ( $table_post_meta['jtFootableBPmedium'] ?? '' );
-		$myjtbpfootab['small']  = (string) ( $table_post_meta['jtFootableBPsmall'] ?? '' );
-		$myjtbpfootab['xsmall'] = (string) ( $table_post_meta['jtFootableBPxsmall'] ?? '' );
-	}
-
-	$myjttableFiltering = isset( $table_post_meta['jtTableEnableFilters'] ) ? 'true' : 'false';
-	$myjttableSorting   = isset( $table_post_meta['jtTableEnableSorting'] ) ? 'true' : 'false';
-	$myjttablePaging    = isset( $table_post_meta['jtTableEnablePaging'] ) ? 'true' : 'false';
-	$myjttablePagingCnt = (string) ( $table_post_meta['jtTableEnablePagingCnt'] ?? '10' );
-
-	$paging_menu_raw     = (string) ( $table_post_meta['jtTablePagingMenu'] ?? '' );
-	$myjttablePagingMenu = ( $paging_menu_raw !== '' && is_array( explode( ',', $paging_menu_raw ) ) ) ? $paging_menu_raw : '10,25,50,100';
-
-	$html = "<div class='jtrt_table_MotherShipContainer'>";
-
-	if ( $showTableTitle === 'true' && isset( $showTableTitlePos[0] ) && $showTableTitlePos[0] === 'top' ) {
-		$html .= "<div id='jtHeaderHolder-" . $jtrt_settings['id'] . "'><h3 style='margin-top:24px;margin-bottom:14px;text-align:" . ( $showTableTitlePos[1] ?? '' ) . ";'>" . $myTableTitle . '</h3>';
-		$html .= '</div>';
-	}
-
-	$html .= "<div class='jtTableContainer jtrespo-" . $myTableResponsiveStyle . ' ' . $myTableHoverRows . ' ' . $myTableHoverCols . "' " . ( $myTableResponsiveStyle === 'stack' ? "data-jtrt-stack-width='" . $myTableStackPrefWidth . "'" : '' ) . '>';
-
-	// We can only return once, so let's build our html!
-	$html .= "<div class='jtsettingcontainer' style='display:none;position:absolute;left:-9999px;'><textarea data-jtrt-table-id='" . $jtrt_settings['id'] . "' id='jtrt_table_settings_" . $jtrt_settings['id'] . "' cols='30' rows='10'>" . json_encode( $table_data_json ) . "</textarea><textarea data-jtrt-table-id='" . $jtrt_settings['id'] . "' id='jtrt_table_bps_" . $jtrt_settings['id'] . "' cols='30' rows='10'>" . json_encode( $myjtbpfootab ) . "</textarea></div><table id='jtrt_table_" . $jtrt_settings['id'] . "' data-sorting='" . $myjttableSorting . "' data-paging='" . $myjttablePaging . "' data-paging-size='" . $myjttablePagingCnt . "' data-paging-menu='" . $myjttablePagingMenu . "' data-filtering='" . $myjttableFiltering . "' data-jtrt-table-id='" . $jtrt_settings['id'] . "' class='jtrt-table " . $myTableCustomClass . " ' >";
-
-	$filteredRows = $jtrt_settings['filterrows'] !== '' ? array_flip( explode( ',', (string) $jtrt_settings['filterrows'] ) ) : array();
-	$filteredCols = $jtrt_settings['filtercols'] !== '' ? array_flip( explode( ',', (string) $jtrt_settings['filtercols'] ) ) : array();
-
-	/**
-	 * Helper function to process cell content efficiently.
-	 *
-	 * @param mixed $cell The cell content.
-	 * @return string Processed content.
-	 */
-	$process_cell = static function ( $cell ) {
-		$cell_str = (string) $cell;
-		if ( $cell_str === '' ) {
-			return '';
+		if ( ! $table_data ) {
+			return 'Unfortunately we could not locate the table you\'re looking for.';
 		}
 
-		// Only replace newlines if they exist.
-		if ( str_contains( $cell_str, "\n" ) || str_contains( $cell_str, "\r" ) ) {
-			$cell_str = str_replace( array( "\r\n", "\r", "\n" ), '<br>', $cell_str );
+		$showTableTitle    = isset( $table_post_meta['jtShowTableTitle'] ) ? 'true' : 'false';
+		$showTableTitlePos = explode( ',', (string) ( $table_post_meta['jtShowTableTitlePos'] ?? '' ) );
+		$myTableTitle      = get_the_title( $table_id );
+
+		$myTableResponsiveStyle = (string) ( $table_post_meta['jtTableResponsiveStyle'] ?? '' );
+		$myTableStackPrefWidth  = (string) ( $table_post_meta['jtStackPrefWidth'] ?? '' );
+
+		$myTableCustomClass = esc_textarea( (string) ( $table_post_meta['jtTableCustomClass'] ?? '' ) );
+
+		$myTableHoverRows = isset( $table_post_meta['jtTableEnableRowHighlight'] ) ? 'highlightRows' : '';
+		$myTableHoverCols = isset( $table_post_meta['jtTableEnableColHighlight'] ) ? 'highlightCols' : '';
+
+		$myjttableFiltering = isset( $table_post_meta['jtTableEnableFilters'] ) ? 'true' : 'false';
+		$myjttableSorting   = isset( $table_post_meta['jtTableEnableSorting'] ) ? 'true' : 'false';
+		$myjttablePaging    = isset( $table_post_meta['jtTableEnablePaging'] ) ? 'true' : 'false';
+		$myjttablePagingCnt = (string) ( $table_post_meta['jtTableEnablePagingCnt'] ?? '10' );
+
+		$paging_menu_raw     = (string) ( $table_post_meta['jtTablePagingMenu'] ?? '' );
+		$myjttablePagingMenu = ( $paging_menu_raw !== '' && is_array( explode( ',', $paging_menu_raw ) ) ) ? $paging_menu_raw : '10,25,50,100';
+
+		$myjtbpfootab = array();
+		if ( $myTableResponsiveStyle === 'footable' ) {
+			$myjtbpfootab['xlarge'] = (string) ( $table_post_meta['jtFootableBPxlarge'] ?? '' );
+			$myjtbpfootab['large']  = (string) ( $table_post_meta['jtFootableBPlarge'] ?? '' );
+			$myjtbpfootab['medium'] = (string) ( $table_post_meta['jtFootableBPmedium'] ?? '' );
+			$myjtbpfootab['small']  = (string) ( $table_post_meta['jtFootableBPsmall'] ?? '' );
+			$myjtbpfootab['xsmall'] = (string) ( $table_post_meta['jtFootableBPxsmall'] ?? '' );
 		}
 
-		// Only run do_shortcode if shortcodes are likely present.
-		if ( str_contains( $cell_str, '[' ) ) {
-			return do_shortcode( $cell_str );
+		$html = "<div class='jtrt_table_MotherShipContainer'>";
+
+		if ( $showTableTitle === 'true' && isset( $showTableTitlePos[0] ) && $showTableTitlePos[0] === 'top' ) {
+			$html .= "<div id='jtHeaderHolder-" . $table_id . "'><h3 style='margin-top:24px;margin-bottom:14px;text-align:" . ( $showTableTitlePos[1] ?? '' ) . ";'>" . $myTableTitle . '</h3>';
+			$html .= '</div>';
 		}
 
-		return $cell_str;
-	};
+		$html .= "<div class='jtTableContainer jtrespo-" . $myTableResponsiveStyle . ' ' . $myTableHoverRows . ' ' . $myTableHoverCols . "' " . ( $myTableResponsiveStyle === 'stack' ? "data-jtrt-stack-width='" . $myTableStackPrefWidth . "'" : '' ) . '>';
 
-	// For each loop to loop through the table data, the first loop is the rows.
-	foreach ( $table_data as $indx => $row ) {
-		$row_num_str = (string) ( $indx + 1 );
-		if ( isset( $filteredRows[ $row_num_str ] ) ) {
-			continue;
-		}
+		// We can only return once, so let's build our html!
+		$html .= "<div class='jtsettingcontainer' style='display:none;position:absolute;left:-9999px;'><textarea data-jtrt-table-id='" . $table_id . "' id='jtrt_table_settings_" . $table_id . "' cols='30' rows='10'>" . json_encode( $table_data_json ) . "</textarea><textarea data-jtrt-table-id='" . $table_id . "' id='jtrt_table_bps_" . $table_id . "' cols='30' rows='10'>" . json_encode( $myjtbpfootab ) . "</textarea></div><table id='jtrt_table_" . $table_id . "' data-sorting='" . $myjttableSorting . "' data-paging='" . $myjttablePaging . "' data-paging-size='" . $myjttablePagingCnt . "' data-paging-menu='" . $myjttablePagingMenu . "' data-filtering='" . $myjttableFiltering . "' data-jtrt-table-id='" . $table_id . "' class='jtrt-table " . $myTableCustomClass . " ' >";
 
-		if ( $indx === 0 ) {
-			$html .= '<thead><tr>';
-			foreach ( $row as $cellindx => $cell ) {
-				$col_num_str = (string) ( $cellindx + 1 );
-				// For each col item, insert the table data tag and put the data inside it.
-				if ( ! isset( $filteredCols[ $col_num_str ] ) ) {
-					$html .= '<th>' . $process_cell( $cell ) . '</th>';
-				}
+		$filteredRows = $jtrt_settings['filterrows'] !== '' ? array_flip( explode( ',', (string) $jtrt_settings['filterrows'] ) ) : array();
+		$filteredCols = $jtrt_settings['filtercols'] !== '' ? array_flip( explode( ',', (string) $jtrt_settings['filtercols'] ) ) : array();
+
+		/**
+		 * Helper function to process cell content efficiently.
+		 *
+		 * @param mixed $cell The cell content.
+		 * @return string Processed content.
+		 */
+		$process_cell = static function ( $cell ) {
+			$cell_str = (string) $cell;
+			if ( $cell_str === '' ) {
+				return '';
 			}
-			$html .= '</tr></thead><tbody>';
-		} else {
-			// For each row, add the table row tag
-			$html .= '<tr>';
-			// Start another loop just for good measure. just kidding, we need this loop for the columns within the rows.
-			foreach ( $row as $cellindx => $cell ) {
-				$col_num_str = (string) ( $cellindx + 1 );
-				// For each col item, insert the table data tag and put the data inside it.
-				if ( ! isset( $filteredCols[ $col_num_str ] ) ) {
-					if ( $myTableResponsiveStyle === 'stack' ) {
-						$header_title = $process_cell( $table_data[0][ $cellindx ] ?? '' );
-						$html        .= "<td><span class='stackedheadtitlejt' style='font-weight:bold;'>" . $header_title . ':</span><br>' . $process_cell( $cell ) . '</td>';
-					} else {
-						$html .= '<td>' . $process_cell( $cell ) . '</td>';
+
+			// Only replace newlines if they exist.
+			if ( str_contains( $cell_str, "\n" ) || str_contains( $cell_str, "\r" ) ) {
+				$cell_str = str_replace( array( "\r\n", "\r", "\n" ), '<br>', $cell_str );
+			}
+
+			// Only run do_shortcode if shortcodes are likely present.
+			if ( str_contains( $cell_str, '[' ) ) {
+				return do_shortcode( $cell_str );
+			}
+
+			return $cell_str;
+		};
+
+		// For each loop to loop through the table data, the first loop is the rows.
+		foreach ( $table_data as $indx => $row ) {
+			$row_num_str = (string) ( $indx + 1 );
+			if ( isset( $filteredRows[ $row_num_str ] ) ) {
+				continue;
+			}
+
+			if ( $indx === 0 ) {
+				$html .= '<thead><tr>';
+				foreach ( $row as $cellindx => $cell ) {
+					$col_num_str = (string) ( $cellindx + 1 );
+					// For each col item, insert the table data tag and put the data inside it.
+					if ( ! isset( $filteredCols[ $col_num_str ] ) ) {
+						$html .= '<th>' . $process_cell( $cell ) . '</th>';
 					}
 				}
+				$html .= '</tr></thead><tbody>';
+			} else {
+				// For each row, add the table row tag
+				$html .= '<tr>';
+				// Start another loop just for good measure. just kidding, we need this loop for the columns within the rows.
+				foreach ( $row as $cellindx => $cell ) {
+					$col_num_str = (string) ( $cellindx + 1 );
+					// For each col item, insert the table data tag and put the data inside it.
+					if ( ! isset( $filteredCols[ $col_num_str ] ) ) {
+						if ( $myTableResponsiveStyle === 'stack' ) {
+							$header_title = $process_cell( $table_data[0][ $cellindx ] ?? '' );
+							$html        .= "<td><span class='stackedheadtitlejt' style='font-weight:bold;'>" . $header_title . ':</span><br>' . $process_cell( $cell ) . '</td>';
+						} else {
+							$html .= '<td>' . $process_cell( $cell ) . '</td>';
+						}
+					}
+				}
+				// close our tr so the HTML inspectors happy. Just kidding this is important.
+				$html .= '</tr>';
 			}
-			// close our tr so the HTML inspectors happy. Just kidding this is important.
-			$html .= '</tr>';
 		}
-	}
 
-	$html .= '</tbody>';
-	// Finalize our HTML
-	$html .= '</table>';
+		$html .= '</tbody>';
+		// Finalize our HTML
+		$html .= '</table>';
 
-	$html .= '</div>';
-
-	if ( $showTableTitle === 'true' && isset( $showTableTitlePos[0] ) && $showTableTitlePos[0] === 'bottom' ) {
-		$html .= "<div id='jtFooterHolder-" . $jtrt_settings['id'] . "'>";
-		$html .= "<h3 style='margin-top:0;margin-bottom:14px;text-align:" . ( $showTableTitlePos[1] ?? '' ) . ";'>" . $myTableTitle . '</h3>';
 		$html .= '</div>';
+
+		if ( $showTableTitle === 'true' && isset( $showTableTitlePos[0] ) && $showTableTitlePos[0] === 'bottom' ) {
+			$html .= "<div id='jtFooterHolder-" . $table_id . "'>";
+			$html .= "<h3 style='margin-top:0;margin-bottom:14px;text-align:" . ( $showTableTitlePos[1] ?? '' ) . ";'>" . $myTableTitle . '</h3>';
+			$html .= '</div>';
+		}
+
+		$html .= '</div>';
+
+		// Set transient for 12 hours.
+		set_transient( $cache_key, $html, 12 * HOUR_IN_SECONDS );
 	}
 
-	$html .= '</div>';
+	// Always enqueue necessary assets.
+	$myTableResponsiveStyle = (string) ( $table_post_meta['jtTableResponsiveStyle'] ?? '' );
+	$myjttableFiltering     = isset( $table_post_meta['jtTableEnableFilters'] ) ? 'true' : 'false';
+	$myjttableSorting       = isset( $table_post_meta['jtTableEnableSorting'] ) ? 'true' : 'false';
+	$myjttablePaging        = isset( $table_post_meta['jtTableEnablePaging'] ) ? 'true' : 'false';
 
 	if ( $myTableResponsiveStyle === 'footable' ) {
 		wp_enqueue_script( 'jtbackendfrontendfoo-js', plugin_dir_url( __FILE__ ) . '../../public/js/vendor/footable.min.js', array( 'jquery' ), '4.0', false );
@@ -190,18 +206,14 @@ function jtrt_shortcode_table( $atts ) {
 	wp_enqueue_script( 'jtbackendfrontend-js', plugin_dir_url( __FILE__ ) . '../../public/js/jtrt-responsive-tables-public.js', array( 'jquery' ), '4.0', false );
 
 	$custom_css = '';
-
 	if ( isset( $table_post_meta['jtTableEnableColHighlight'] ) ) {
-		$custom_css .= '.highlightCols #jtrt_table_' . $jtrt_settings['id'] . ' tbody td.jtrt-col-hoveredOver { background:' . ( $table_post_meta['jtTableEnableColHighlightcol'] ?? '' ) . ' !important; }';
+		$custom_css .= '.highlightCols #jtrt_table_' . $table_id . ' tbody td.jtrt-col-hoveredOver { background:' . ( $table_post_meta['jtTableEnableColHighlightcol'] ?? '' ) . ' !important; }';
 	}
-
 	if ( isset( $table_post_meta['jtTableEnableRowHighlight'] ) ) {
-		$custom_css .= '.highlightRows #jtrt_table_' . $jtrt_settings['id'] . ' tbody tr:hover td { background:' . ( $table_post_meta['jtTableEnableRowHighlightcol'] ?? '' ) . ' !important; }';
+		$custom_css .= '.highlightRows #jtrt_table_' . $table_id . ' tbody tr:hover td { background:' . ( $table_post_meta['jtTableEnableRowHighlightcol'] ?? '' ) . ' !important; }';
 	}
-
 	wp_add_inline_style( 'jtbackendfrontend-css', $custom_css );
 
-	// Blast off! We've done our part here in the server, Javascript will handle the rest.
 	return $html;
 }
 
