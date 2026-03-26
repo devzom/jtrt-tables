@@ -17,8 +17,8 @@ declare(strict_types=1);
  * @wordpress-plugin
  * Plugin Name:       JTRT Responsive Tables
  * Plugin URI:        https://wordpress.org/plugins/jtrt-responsive-tables/
- * Description:       The most advanced table editor for wordpress.
- * Version:           5.0.0
+ * Description:       The most advanced table editor for WordPress.
+ * Version:           5.3.0
  * Author:            Jakub Zomerfeld after John Tendik
  * Author URI:        https://github.com/devzom
  * License:           GPL-2.0+
@@ -72,6 +72,5 @@ function run_jtrt_responsive_tables(): void {
 
 	$plugin = new Jtrt_Responsive_Tables();
 	$plugin->run();
-
 }
 run_jtrt_responsive_tables();
