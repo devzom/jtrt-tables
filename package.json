@@ -1,6 +1,6 @@
 {
   "name": "jtrt-tables",
-  "version": "1.0.0",
+  "version": "5.4.0",
   "description": "If you're here for the older version docs, they are now located on their own branch.",
   "homepage": "https://github.com/JohnTendik/jtrt-tables#readme",
   "bugs": {
@@ -23,7 +23,6 @@
     "plugin:zip": "zip -r jtrt-responsive-tables.zip jtrt-responsive-tables"
   },
   "devDependencies": {
-    "@wordpress/eslint-plugin": "^24.4.0",
-    "eslint-plugin-react": "^7.37.5"
+    "@wordpress/eslint-plugin": "^24.4.0"
   }
 }
