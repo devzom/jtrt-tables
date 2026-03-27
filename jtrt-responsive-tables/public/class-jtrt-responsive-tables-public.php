@@ -75,8 +75,7 @@ class Jtrt_Responsive_Tables_Public {
 		 */
 
 		wp_register_style( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'css/jtrt-responsive-tables-public.css', array(), $this->version, 'all' );
-		wp_register_style( $this->plugin_name . '-font-awesome', plugin_dir_url( __FILE__ ) . 'css/font-awesome.min.css', array(), '4.7.0', 'all' );
-		wp_register_style( $this->plugin_name . '-footable', plugin_dir_url( __FILE__ ) . 'css/footable.standalone.min.css', array(), '2.0.3', 'all' );
+		wp_register_style( $this->plugin_name . '-footable', plugin_dir_url( __FILE__ ) . 'css/footable.standalone.min.css', array( 'dashicons' ), '2.0.3', 'all' );
 		wp_register_style( $this->plugin_name . '-datatables', 'https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css', array(), '1.10.12', 'all' );
 	}
 

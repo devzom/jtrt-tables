@@ -179,7 +179,6 @@ function jtrt_shortcode_table( $atts ) {
 
 	if ( $myTableResponsiveStyle === 'footable' ) {
 		wp_enqueue_script( $plugin_name . '-footable' );
-		wp_enqueue_style( $plugin_name . '-font-awesome' );
 		wp_enqueue_style( $plugin_name . '-footable' );
 	} elseif ( $myTableResponsiveStyle === 'scroll' || $myTableResponsiveStyle === 'stack' ) {
 		if ( $myjttableFiltering === 'true' || $myjttablePaging === 'true' || $myjttableSorting === 'true' ) {
