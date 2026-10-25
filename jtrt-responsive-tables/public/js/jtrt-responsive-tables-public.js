@@ -95,8 +95,7 @@
 		
 
 		$('.jtrespo-footable table').each(function(idx,elem){
-			var id = $(elem).attr('data-jtrt-table-id');
-			var footablBreaksjt = JSON.parse($('#jtrt_table_bps_'+id).html());
+			var footablBreaksjt = $(elem).data('jtrt-breakpoints');
 			$(elem).footable({
 				"breakpoints": footablBreaksjt,
 				"useParentWidth": true,
