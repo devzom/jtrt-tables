@@ -3,6 +3,73 @@
 declare(strict_types=1);
 
 /**
+ * HTML tags and attributes allowed inside table cell content.
+ *
+ * Shared by the metabox save handler and the shortcode renderer so stored
+ * and rendered cell content pass through the same wp_kses allow-list.
+ *
+ * @return array<string, array<string, array>> The wp_kses allow-list.
+ */
+function jtrt_get_allowed_cell_html(): array {
+	return array(
+		'a'      => array(
+			'href'   => array(),
+			'title'  => array(),
+			'target' => array(),
+		),
+		'br'     => array(),
+		'em'     => array(),
+		'strong' => array(),
+		'b'      => array(),
+		'i'      => array(),
+		'u'      => array(),
+		'big'    => array(),
+		'span'   => array(
+			'style' => array(),
+			'class' => array(),
+		),
+		'img'    => array(
+			'src'    => array(),
+			'alt'    => array(),
+			'width'  => array(),
+			'height' => array(),
+			'class'  => array(),
+		),
+		'ul'     => array(),
+		'li'     => array(),
+		'ol'     => array(),
+		'hr'     => array(),
+		'p'      => array(
+			'style' => array(),
+			'class' => array(),
+		),
+		'div'    => array(
+			'style' => array(),
+			'class' => array(),
+		),
+		'table'  => array(
+			'class' => array(),
+			'style' => array(),
+		),
+		'thead'  => array(),
+		'tbody'  => array(),
+		'tr'     => array(),
+		'td'     => array(
+			'colspan' => array(),
+			'rowspan' => array(),
+			'style'   => array(),
+			'class'   => array(),
+		),
+		'th'     => array(
+			'colspan' => array(),
+			'rowspan' => array(),
+			'style'   => array(),
+			'class'   => array(),
+		),
+	);
+}
+
+/**
  * Shortcode for displaying the JTRT table.
  *
  * @param array|string $atts Shortcode attributes.

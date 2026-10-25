@@ -171,62 +171,7 @@ class Jtrt_Responsive_Tables_Admin {
 		$my_data = $_POST['jtrt-table-data'];
 
 		if ( is_array( $my_data ) ) {
-			$allowed_html = array(
-				'a'      => array(
-					'href'   => array(),
-					'title'  => array(),
-					'target' => array(),
-				),
-				'br'     => array(),
-				'em'     => array(),
-				'strong' => array(),
-				'b'      => array(),
-				'i'      => array(),
-				'u'      => array(),
-				'big'    => array(),
-				'span'   => array(
-					'style' => array(),
-					'class' => array(),
-				),
-				'img'    => array(
-					'src'    => array(),
-					'alt'    => array(),
-					'width'  => array(),
-					'height' => array(),
-					'class'  => array(),
-				),
-				'ul'     => array(),
-				'li'     => array(),
-				'ol'     => array(),
-				'hr'     => array(),
-				'p'      => array(
-					'style' => array(),
-					'class' => array(),
-				),
-				'div'    => array(
-					'style' => array(),
-					'class' => array(),
-				),
-				'table'  => array(
-					'class' => array(),
-					'style' => array(),
-				),
-				'thead'  => array(),
-				'tbody'  => array(),
-				'tr'     => array(),
-				'td'     => array(
-					'colspan' => array(),
-					'rowspan' => array(),
-					'style'   => array(),
-					'class'   => array(),
-				),
-				'th'     => array(
-					'colspan' => array(),
-					'rowspan' => array(),
-					'style'   => array(),
-					'class'   => array(),
-				),
-			);
+			$allowed_html = jtrt_get_allowed_cell_html();
 
 			array_walk(
 				$my_data,
