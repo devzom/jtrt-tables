@@ -60,41 +60,15 @@ table tr :is(td, th) {
 
 /* Stackable Table Layout */
 .jtrespo-stack {
+  container-type: inline-size;
+
   & table {
     max-width: 100%;
     width: 100%;
-
-    &.stackMeNowJT {
-      & thead {
-        display: none;
-      }
-
-      & :is(tr, th, td) {
-        display: block;
-      }
-
-      & tr {
-        margin-bottom: 24px;
-        padding: 8px;
-        background: #fbfafa;
-        border: solid 1px #ccc;
-        box-shadow: 0px 0px 4px #ccc;
-
-        & td {
-          border-top: none;
-          margin-bottom: 4px;
-
-          &:first-child {
-            font-weight: bold;
-          }
-        }
-      }
-
-      & .stackedheadtitlejt {
-        display: inline-block;
-      }
-    }
   }
+
+  /* Stacked layout is applied by a per-table @container rule emitted
+     with the shortcode output (see jtrt-adminClass-shortcode.php). */
 
   & .stackedheadtitlejt {
     display: none;
