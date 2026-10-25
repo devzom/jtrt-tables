@@ -168,7 +168,7 @@ function jtrt_build_cell_attributes( array $meta, string $content ): string {
  * Bump it whenever the rendered markup changes so HTML cached by a previous
  * renderer is never served.
  */
-const JTRT_TABLE_RENDER_VERSION = '3';
+const JTRT_TABLE_RENDER_VERSION = '4';
 
 /**
  * Shortcode for displaying the JTRT table.
@@ -219,7 +219,6 @@ function jtrt_shortcode_table( $atts ) {
 		$myTableTitle      = get_the_title( $table_id );
 
 		$myTableResponsiveStyle = (string) ( $table_post_meta['jtTableResponsiveStyle'] ?? '' );
-		$myTableStackPrefWidth  = (string) ( $table_post_meta['jtStackPrefWidth'] ?? '' );
 
 		$myTableCustomClass = esc_textarea( (string) ( $table_post_meta['jtTableCustomClass'] ?? '' ) );
 
@@ -250,7 +249,7 @@ function jtrt_shortcode_table( $atts ) {
 			$html .= '</div>';
 		}
 
-		$html .= "<div class='jtTableContainer jtrespo-" . $myTableResponsiveStyle . ' ' . $myTableHoverRows . ' ' . $myTableHoverCols . "' " . ( $myTableResponsiveStyle === 'stack' ? "data-jtrt-stack-width='" . $myTableStackPrefWidth . "'" : '' ) . '>';
+		$html .= "<div class='jtTableContainer jtrespo-" . $myTableResponsiveStyle . ' ' . $myTableHoverRows . ' ' . $myTableHoverCols . "'>";
 
 		// We can only return once, so let's build our html!
 		$html .= "<table id='jtrt_table_" . $table_id . "' data-sorting='" . $myjttableSorting . "' data-paging='" . $myjttablePaging . "' data-paging-size='" . $myjttablePagingCnt . "' data-paging-menu='" . $myjttablePagingMenu . "' data-filtering='" . $myjttableFiltering . "' data-jtrt-table-id='" . $table_id . "' data-jtrt-breakpoints='" . esc_attr( wp_json_encode( $myjtbpfootab ) ) . "' class='jtrt-table " . $myTableCustomClass . " ' >";
@@ -402,6 +401,22 @@ function jtrt_shortcode_table( $atts ) {
 	wp_enqueue_script( $plugin_name );
 
 	$custom_css = '';
+	if ( 'stack' === $myTableResponsiveStyle ) {
+		$stack_width = (int) ( $table_post_meta['jtStackPrefWidth'] ?? 0 );
+		if ( $stack_width > 0 ) {
+			// Stacked layout applied via a per-table container query, so no resize JS is needed.
+			// These rules replace the former .stackMeNowJT styles; see jtrt-responsive-tables-public.css.
+			$table_sel   = '#jtrt_table_' . $table_id;
+			$custom_css .= '@container (max-width:' . $stack_width . 'px) {'
+				. ' ' . $table_sel . ' thead { display:none; }'
+				. ' ' . $table_sel . ' tr, ' . $table_sel . ' th, ' . $table_sel . ' td { display:block; }'
+				. ' ' . $table_sel . ' tr { margin-bottom:24px; padding:8px; background:#fbfafa; border:solid 1px #ccc; box-shadow:0 0 4px #ccc; }'
+				. ' ' . $table_sel . ' tr td { border-top:none; margin-bottom:4px; }'
+				. ' ' . $table_sel . ' tr td:first-child { font-weight:bold; }'
+				. ' ' . $table_sel . ' .stackedheadtitlejt { display:inline-block; }'
+				. '}';
+		}
+	}
 	if ( isset( $table_post_meta['jtTableEnableColHighlight'] ) ) {
 		$custom_css .= '.highlightCols #jtrt_table_' . $table_id . ' tbody td.jtrt-col-hoveredOver { background:' . ( $table_post_meta['jtTableEnableColHighlightcol'] ?? '' ) . ' !important; }';
 	}
