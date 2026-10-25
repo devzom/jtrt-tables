@@ -3,6 +3,174 @@
 declare(strict_types=1);
 
 /**
+ * HTML tags and attributes allowed inside table cell content.
+ *
+ * Shared by the metabox save handler and the shortcode renderer so stored
+ * and rendered cell content pass through the same wp_kses allow-list.
+ *
+ * @return array<string, array<string, array>> The wp_kses allow-list.
+ */
+function jtrt_get_allowed_cell_html(): array {
+	return array(
+		'a'      => array(
+			'href'   => array(),
+			'title'  => array(),
+			'target' => array(),
+		),
+		'br'     => array(),
+		'em'     => array(),
+		'strong' => array(),
+		'b'      => array(),
+		'i'      => array(),
+		'u'      => array(),
+		'big'    => array(),
+		'span'   => array(
+			'style' => array(),
+			'class' => array(),
+		),
+		'img'    => array(
+			'src'    => array(),
+			'alt'    => array(),
+			'width'  => array(),
+			'height' => array(),
+			'class'  => array(),
+		),
+		'ul'     => array(),
+		'li'     => array(),
+		'ol'     => array(),
+		'hr'     => array(),
+		'p'      => array(
+			'style' => array(),
+			'class' => array(),
+		),
+		'div'    => array(
+			'style' => array(),
+			'class' => array(),
+		),
+		'table'  => array(
+			'class' => array(),
+			'style' => array(),
+		),
+		'thead'  => array(),
+		'tbody'  => array(),
+		'tr'     => array(),
+		'td'     => array(
+			'colspan' => array(),
+			'rowspan' => array(),
+			'style'   => array(),
+			'class'   => array(),
+		),
+		'th'     => array(
+			'colspan' => array(),
+			'rowspan' => array(),
+			'style'   => array(),
+			'class'   => array(),
+		),
+	);
+}
+
+/**
+ * Index table cell entries (cell meta or formula results) by their position.
+ *
+ * Entries without integer `row` and `col` cannot be placed on a cell and are skipped.
+ *
+ * @param array $entries List of entries, each with `row` and `col` keys.
+ * @return array<string, array> Entries keyed by "{row}:{col}".
+ */
+function jtrt_index_cells_by_position( array $entries ): array {
+	$indexed = array();
+	foreach ( $entries as $entry ) {
+		if ( ! is_array( $entry ) || ! is_int( $entry['row'] ?? null ) || ! is_int( $entry['col'] ?? null ) ) {
+			continue;
+		}
+		$indexed[ $entry['row'] . ':' . $entry['col'] ] = $entry;
+	}
+	return $indexed;
+}
+
+/**
+ * Build the escaped HTML attribute string for a single table cell from its editor meta.
+ *
+ * Produces the same classes, inline styles and FooTable data attributes the editor meta
+ * describes: `className` tokens, a `border-{side}` class per visible border side with
+ * the last visible side's width and color, `jtcellstyle` declarations, `data-breakpoints`
+ * with `data-title`, and `data-type`.
+ *
+ * @param array  $meta    Cell meta entry from the table data (index 1), or an empty array.
+ * @param string $content Final cell HTML, used for the FooTable `data-title`.
+ * @return string Attribute string with a leading space, or an empty string.
+ */
+function jtrt_build_cell_attributes( array $meta, string $content ): string {
+	$classes = preg_split( '/\s+/', is_string( $meta['className'] ?? null ) ? $meta['className'] : '', -1, PREG_SPLIT_NO_EMPTY );
+	$styles  = array();
+
+	$borders = $meta['borders'] ?? null;
+	if ( is_array( $borders ) ) {
+		foreach ( $borders as $side => $border ) {
+			if ( ! in_array( $side, array( 'top', 'right', 'bottom', 'left' ), true ) || ! is_array( $border ) || array() === $border || ! empty( $border['hide'] ) ) {
+				continue;
+			}
+			$classes[]              = 'border-' . $side;
+			$styles['border-width'] = is_scalar( $border['width'] ?? null ) ? (string) $border['width'] : '';
+			$styles['border-color'] = is_scalar( $border['color'] ?? null ) ? (string) $border['color'] : '';
+		}
+	}
+
+	$cell_style = $meta['jtcellstyle'] ?? null;
+	if ( is_array( $cell_style ) ) {
+		foreach ( $cell_style as $property => $value ) {
+			if ( is_scalar( $value ) ) {
+				$styles[ (string) $property ] = (string) $value;
+			}
+		}
+	}
+
+	$attributes = array();
+
+	$class_attr = implode( ' ', array_unique( array_filter( array_map( 'sanitize_html_class', $classes ) ) ) );
+	if ( '' !== $class_attr ) {
+		$attributes['class'] = $class_attr;
+	}
+
+	$declarations = array();
+	foreach ( $styles as $property => $value ) {
+		if ( '' !== $value ) {
+			$declarations[] = $property . ':' . $value;
+		}
+	}
+	$style_attr = safecss_filter_attr( implode( ';', $declarations ) );
+	if ( '' !== $style_attr ) {
+		$attributes['style'] = $style_attr;
+	}
+
+	$breakpoints = $meta['jtfootablebps'] ?? null;
+	if ( is_array( $breakpoints ) ) {
+		$breakpoint_names               = array_map( 'strval', array_filter( $breakpoints, 'is_scalar' ) );
+		$attributes['data-breakpoints'] = implode( ' ', array_filter( $breakpoint_names, static fn( string $name ): bool => '' !== $name ) );
+		$attributes['data-title']       = $content;
+	}
+
+	$column_type = $meta['jtfootabcoltype'] ?? null;
+	if ( is_scalar( $column_type ) && '' !== (string) $column_type ) {
+		$attributes['data-type'] = (string) $column_type;
+	}
+
+	$output = '';
+	foreach ( $attributes as $name => $value ) {
+		$output .= ' ' . $name . '="' . esc_attr( $value ) . '"';
+	}
+	return $output;
+}
+
+/**
+ * Version of the shortcode HTML output, part of the transient cache key.
+ *
+ * Bump it whenever the rendered markup changes so HTML cached by a previous
+ * renderer is never served.
+ */
+const JTRT_TABLE_RENDER_VERSION = '2';
+
+/**
  * Shortcode for displaying the JTRT table.
  *
  * @param array|string $atts Shortcode attributes.
@@ -33,13 +201,14 @@ function jtrt_shortcode_table( $atts ) {
 
 	// Generate a unique cache key based on ID, filters, and cache version.
 	$cache_version = get_post_meta( $table_id, '_jtrt_cache_version', true );
-	$cache_key     = 'jtrt_cache_' . $table_id . '_' . $cache_version . '_' . md5( (string) $jtrt_settings['filterrows'] . (string) $jtrt_settings['filtercols'] );
+	$cache_key     = 'jtrt_cache_' . JTRT_TABLE_RENDER_VERSION . '_' . $table_id . '_' . $cache_version . '_' . md5( (string) $jtrt_settings['filterrows'] . (string) $jtrt_settings['filtercols'] );
 	$html          = get_transient( $cache_key );
 
 	if ( $html === false ) {
 		$table_data_json = json_decode( (string) $table_post_meta['tabledata'], true );
 		$table_data      = $table_data_json[0] ?? null;
-		$table_cell_data = $table_data_json[1] ?? array();
+		$cell_meta       = jtrt_index_cells_by_position( is_array( $table_data_json[1] ?? null ) ? $table_data_json[1] : array() );
+		$cell_values     = jtrt_index_cells_by_position( is_array( $table_data_json[3] ?? null ) ? $table_data_json[3] : array() );
 
 		if ( ! $table_data ) {
 			return 'Unfortunately we could not locate the table you\'re looking for.';
@@ -114,6 +283,31 @@ function jtrt_shortcode_table( $atts ) {
 			return $cell_str;
 		};
 
+		$allowed_cell_html = jtrt_get_allowed_cell_html();
+
+		/**
+		 * Resolve the final HTML of a cell: the computed formula result when present, else the processed raw value.
+		 *
+		 * @param int   $row  Original row index.
+		 * @param int   $col  Original column index.
+		 * @param mixed $cell Raw cell value.
+		 * @return string Cell HTML.
+		 */
+		$resolve_content = static function ( int $row, int $col, $cell ) use ( $cell_values, $allowed_cell_html, $process_cell ): string {
+			$value = $cell_values[ $row . ':' . $col ]['val'] ?? null;
+			if ( is_scalar( $value ) ) {
+				return wp_kses( (string) $value, $allowed_cell_html );
+			}
+			return $process_cell( $cell );
+		};
+
+		$stack_header_titles = array();
+		if ( 'stack' === $myTableResponsiveStyle && is_array( $table_data[0] ?? null ) ) {
+			foreach ( $table_data[0] as $cellindx => $cell ) {
+				$stack_header_titles[ $cellindx ] = $resolve_content( 0, (int) $cellindx, $cell );
+			}
+		}
+
 		// For each loop to loop through the table data, the first loop is the rows.
 		foreach ( $table_data as $indx => $row ) {
 			$row_num_str = (string) ( $indx + 1 );
@@ -127,7 +321,8 @@ function jtrt_shortcode_table( $atts ) {
 					$col_num_str = (string) ( $cellindx + 1 );
 					// For each col item, insert the table data tag and put the data inside it.
 					if ( ! isset( $filteredCols[ $col_num_str ] ) ) {
-						$html .= '<th>' . $process_cell( $cell ) . '</th>';
+						$content = $resolve_content( (int) $indx, (int) $cellindx, $cell );
+						$html   .= '<th' . jtrt_build_cell_attributes( $cell_meta[ $indx . ':' . $cellindx ] ?? array(), $content ) . '>' . $content . '</th>';
 					}
 				}
 				$html .= '</tr></thead><tbody>';
@@ -139,11 +334,12 @@ function jtrt_shortcode_table( $atts ) {
 					$col_num_str = (string) ( $cellindx + 1 );
 					// For each col item, insert the table data tag and put the data inside it.
 					if ( ! isset( $filteredCols[ $col_num_str ] ) ) {
+						$content    = $resolve_content( (int) $indx, (int) $cellindx, $cell );
+						$attributes = jtrt_build_cell_attributes( $cell_meta[ $indx . ':' . $cellindx ] ?? array(), $content );
 						if ( $myTableResponsiveStyle === 'stack' ) {
-							$header_title = $process_cell( $table_data[0][ $cellindx ] ?? '' );
-							$html        .= "<td><span class='stackedheadtitlejt' style='font-weight:bold;'>" . $header_title . ':</span><br>' . $process_cell( $cell ) . '</td>';
+							$html .= '<td' . $attributes . "><span class='stackedheadtitlejt' style='font-weight:bold;'>" . ( $stack_header_titles[ $cellindx ] ?? '' ) . ':</span><br>' . $content . '</td>';
 						} else {
-							$html .= '<td>' . $process_cell( $cell ) . '</td>';
+							$html .= '<td' . $attributes . '>' . $content . '</td>';
 						}
 					}
 				}
