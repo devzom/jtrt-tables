@@ -71,11 +71,11 @@
 
 		$('.highlightCols').on('mouseenter', 'tbody td', function(){
 			var eq = $(this).index() + 1;
-			$('.highlightCols tbody td:nth-child('+eq+')').addClass('jtrt-col-hoveredOver');
+			$(this).closest('table').find('tbody td:nth-child('+eq+')').addClass('jtrt-col-hoveredOver');
 		});
 		$('.highlightCols').on('mouseleave', 'tbody td', function(){
 			var eq = $(this).index() + 1;
-			$('.highlightCols tbody td:nth-child('+eq+')').removeClass('jtrt-col-hoveredOver');
+			$(this).closest('table').find('tbody td:nth-child('+eq+')').removeClass('jtrt-col-hoveredOver');
 		});
 
 		
