@@ -168,7 +168,7 @@ function jtrt_build_cell_attributes( array $meta, string $content ): string {
  * Bump it whenever the rendered markup changes so HTML cached by a previous
  * renderer is never served.
  */
-const JTRT_TABLE_RENDER_VERSION = '2';
+const JTRT_TABLE_RENDER_VERSION = '3';
 
 /**
  * Shortcode for displaying the JTRT table.
@@ -253,7 +253,7 @@ function jtrt_shortcode_table( $atts ) {
 		$html .= "<div class='jtTableContainer jtrespo-" . $myTableResponsiveStyle . ' ' . $myTableHoverRows . ' ' . $myTableHoverCols . "' " . ( $myTableResponsiveStyle === 'stack' ? "data-jtrt-stack-width='" . $myTableStackPrefWidth . "'" : '' ) . '>';
 
 		// We can only return once, so let's build our html!
-		$html .= "<div class='jtsettingcontainer' style='display:none;position:absolute;left:-9999px;'><textarea data-jtrt-table-id='" . $table_id . "' id='jtrt_table_settings_" . $table_id . "' cols='30' rows='10'>" . json_encode( $table_data_json ) . "</textarea><textarea data-jtrt-table-id='" . $table_id . "' id='jtrt_table_bps_" . $table_id . "' cols='30' rows='10'>" . json_encode( $myjtbpfootab ) . "</textarea></div><table id='jtrt_table_" . $table_id . "' data-sorting='" . $myjttableSorting . "' data-paging='" . $myjttablePaging . "' data-paging-size='" . $myjttablePagingCnt . "' data-paging-menu='" . $myjttablePagingMenu . "' data-filtering='" . $myjttableFiltering . "' data-jtrt-table-id='" . $table_id . "' class='jtrt-table " . $myTableCustomClass . " ' >";
+		$html .= "<table id='jtrt_table_" . $table_id . "' data-sorting='" . $myjttableSorting . "' data-paging='" . $myjttablePaging . "' data-paging-size='" . $myjttablePagingCnt . "' data-paging-menu='" . $myjttablePagingMenu . "' data-filtering='" . $myjttableFiltering . "' data-jtrt-table-id='" . $table_id . "' data-jtrt-breakpoints='" . esc_attr( wp_json_encode( $myjtbpfootab ) ) . "' class='jtrt-table " . $myTableCustomClass . " ' >";
 
 		$filteredRows = $jtrt_settings['filterrows'] !== '' ? array_flip( explode( ',', (string) $jtrt_settings['filterrows'] ) ) : array();
 		$filteredCols = $jtrt_settings['filtercols'] !== '' ? array_flip( explode( ',', (string) $jtrt_settings['filtercols'] ) ) : array();
